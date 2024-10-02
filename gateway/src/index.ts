@@ -39,7 +39,7 @@ app.all(
 const main = async () => {
   await cacheClient.connect();
   await consumer.connect();
-  await consumer.subscribe({ topic: "inventory-updates" });
+  await consumer.subscribe({ topic: "inventory-events" });
   await consumer.run({
     eachMessage: async ({ topic, partition }) => {
       console.log(`[TOPIC]: [${topic}] | PART: ${partition}`);

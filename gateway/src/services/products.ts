@@ -13,6 +13,7 @@ const ProductService = {
     try {
       const cached = await cacheClient.get("products/");
       if (!cached) throw Error("cache not found");
+      console.log("products/ cache hit");
       return JSON.parse(cached);
     } catch (e) {
       const data = await client.get("/").then((d) => d.data.result);

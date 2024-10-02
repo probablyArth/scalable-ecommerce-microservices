@@ -1,5 +1,11 @@
 version: "3.8"
 services:
+  cache-db:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - backend
   users-db:
     image: mongo
     environment:
@@ -38,7 +44,7 @@ services:
     ports:
       - 9092:9092
     environment:
-      KAFKA_CREATE_TOPICS: "order-events:1:1"
+      KAFKA_CREATE_TOPICS: "order-events:1:1,inventory-events:1:1"
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
@@ -106,19 +112,23 @@ services:
 
   api-gateway:
     build:
-      context: ./ApiGateway
+      context: ./gateway
       dockerfile: Dockerfile
     environment:
       API_SECRET: secret
       USERS_SERVICE_URL: http://users-service:8000
       ORDERS_SERVICE_URL: http://orders-service:8000
       PRODUCTS_SERVICE_URL: http://products-service:8000
+      REDIS_URL: redis://cache-db:6379
+      KAFKA_BROKERS: kafka:9092
     ports:
       - 4000:4000
     depends_on:
       - users-service
       - orders-service
       - products-service
+      - cache-db
+      - kafka
     networks:
       - backend
 
