@@ -10,5 +10,6 @@
     "outDir": "./dist",
     "esModuleInterop": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["./dist", "__tests__", "jest.config.js"]
 }
