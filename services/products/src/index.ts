@@ -5,7 +5,7 @@ import express from "express";
 import morgan from "morgan";
 import { z } from "zod";
 import { validateRequestBody } from "zod-express-middleware";
-import { consumer } from "./kafka";
+import { consumer, producer } from "./kafka";
 import { OrderEventPayload } from "./types";
 import { Product } from "./models";
 import mongoose from "mongoose";
@@ -25,6 +25,17 @@ app.post(
   async (req, res) => {
     try {
       const product = await Product.create(req.body);
+      await producer.send({
+        topic: "inventory-events",
+        messages: [
+          {
+            value: JSON.stringify({
+              type: "product-created",
+              payload: product,
+            }),
+          },
+        ],
+      });
       res.json({ result: product });
     } catch (e) {
       res.status(500).json({ error: e.message });
@@ -53,6 +64,7 @@ app.get("/:id", async (req, res) => {
 const main = async () => {
   await mongoose.connect(process.env["MONGO_URI"]);
   await consumer.connect();
+  await producer.connect();
   await consumer.subscribe({ topic: "order-events" }).then(() => {
     "Consumer subscribed to order-events";
   });
@@ -68,6 +80,17 @@ const main = async () => {
           if (existingProduct) {
             existingProduct.quantity -= product.quantity;
             await existingProduct.save();
+            await producer.send({
+              topic: "inventory-events",
+              messages: [
+                {
+                  value: JSON.stringify({
+                    type: "product-updated",
+                    payload: product,
+                  }),
+                },
+              ],
+            });
           }
         }
       }
@@ -86,5 +109,6 @@ main()
   .catch(async (e) => {
     console.error(e);
     await consumer.disconnect();
+    await producer.disconnect();
     process.exit(1);
   });
