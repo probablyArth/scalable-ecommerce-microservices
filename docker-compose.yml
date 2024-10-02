@@ -1,0 +1,113 @@
+version: "3.8"
+services:
+  users-db:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: users-service
+    ports:
+      - 27017:27017
+    volumes:
+      - users_data:/data/db
+
+  orders-db:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: orders-service
+    ports:
+      - 27018:27017
+    volumes:
+      - orders_data:/data/db
+
+  products-db:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: products-service
+    ports:
+      - 27019:27017
+    volumes:
+      - products_data:/data/db
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_CREATE_TOPICS: "order-events:1:1"
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - 2181:2181
+
+  users-service:
+    build:
+      context: ./services/users
+      dockerfile: Dockerfile
+    environment:
+      API_SECRET: secret
+      KAFKA_BROKERS: kafka:9092
+      MONGO_URI: mongodb://username:password@users-db:27017/users-service?authSource=admin
+    ports:
+      - 8001:8000
+    depends_on:
+      - users-db
+      - kafka
+
+  orders-service:
+    build:
+      context: ./services/orders
+      dockerfile: Dockerfile
+    environment:
+      KAFKA_BROKERS: kafka:9092
+      USERS_SERVICE_URL: http://users-service:8000
+      PRODUCTS_SERVICE_URL: http://products-service:8000
+      MONGO_URI: mongodb://username:password@orders-db:27017/orders-service?authSource=admin
+    ports:
+      - 8002:8000
+    depends_on:
+      - orders-db
+      - kafka
+
+  products-service:
+    build:
+      context: ./services/products
+      dockerfile: Dockerfile
+    environment:
+      KAFKA_BROKERS: kafka:9092
+      MONGO_URI: mongodb://username:password@products-db:27017/products-service?authSource=admin
+    ports:
+      - 8003:8000
+    depends_on:
+      - products-db
+      - kafka
+
+  api-gateway:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    environment:
+      API_SECRET: secret
+      USERS_SERVICE_URL: http://users-service:8000
+      ORDERS_SERVICE_URL: http://orders-service:8000
+      PRODUCTS_SERVICE_URL: http://products-service:8000
+    ports:
+      - 4000:4000
+    depends_on:
+      - users-service
+      - orders-service
+      - products-service
+
+volumes:
+  users_data:
+  orders_data:
+  products_data:

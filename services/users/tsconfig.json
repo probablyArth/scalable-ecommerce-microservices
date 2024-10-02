@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+    "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+
+    /* Modules */
+    "module": "commonjs" /* Specify what module code is generated. */,
+
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
+    "outDir": "./dist",
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"]
+}
