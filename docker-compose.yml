@@ -8,8 +8,8 @@ services:
       MONGO_INITDB_DATABASE: users-service
     ports:
       - 27017:27017
-    volumes:
-      - users_data:/data/db
+    networks:
+      - backend
 
   orders-db:
     image: mongo
@@ -19,8 +19,8 @@ services:
       MONGO_INITDB_DATABASE: orders-service
     ports:
       - 27018:27017
-    volumes:
-      - orders_data:/data/db
+    networks:
+      - backend
 
   products-db:
     image: mongo
@@ -30,8 +30,8 @@ services:
       MONGO_INITDB_DATABASE: products-service
     ports:
       - 27019:27017
-    volumes:
-      - products_data:/data/db
+    networks:
+      - backend
 
   kafka:
     image: wurstmeister/kafka
@@ -43,11 +43,15 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
       - zookeeper
+    networks:
+      - backend
 
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - 2181:2181
+    networks:
+      - backend
 
   users-service:
     build:
@@ -57,11 +61,14 @@ services:
       API_SECRET: secret
       KAFKA_BROKERS: kafka:9092
       MONGO_URI: mongodb://username:password@users-db:27017/users-service?authSource=admin
+      USERS_SERVICE_PORT: 8000
     ports:
       - 8001:8000
     depends_on:
       - users-db
       - kafka
+    networks:
+      - backend
 
   orders-service:
     build:
@@ -69,6 +76,7 @@ services:
       dockerfile: Dockerfile
     environment:
       KAFKA_BROKERS: kafka:9092
+      ORDERS_SERVICE_PORT: 8000
       USERS_SERVICE_URL: http://users-service:8000
       PRODUCTS_SERVICE_URL: http://products-service:8000
       MONGO_URI: mongodb://username:password@orders-db:27017/orders-service?authSource=admin
@@ -77,12 +85,15 @@ services:
     depends_on:
       - orders-db
       - kafka
+    networks:
+      - backend
 
   products-service:
     build:
       context: ./services/products
       dockerfile: Dockerfile
     environment:
+      PRODUCTS_SERVICE_PORT: 8000
       KAFKA_BROKERS: kafka:9092
       MONGO_URI: mongodb://username:password@products-db:27017/products-service?authSource=admin
     ports:
@@ -90,6 +101,8 @@ services:
     depends_on:
       - products-db
       - kafka
+    networks:
+      - backend
 
   api-gateway:
     build:
@@ -106,8 +119,8 @@ services:
       - users-service
       - orders-service
       - products-service
+    networks:
+      - backend
 
-volumes:
-  users_data:
-  orders_data:
-  products_data:
+networks:
+  backend:

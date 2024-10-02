@@ -9,6 +9,7 @@ const schema = buildSchema(`
   type Product {
     _id: ID!
     name: String!
+    price: Int!
     quantity: Int!
   } 
 
@@ -35,6 +36,7 @@ const schema = buildSchema(`
 
   input CreateProductInput {
     name: String!
+    price: Int!
     quantity: Int!
   }
 

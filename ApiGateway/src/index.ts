@@ -5,9 +5,16 @@ import express from "express";
 import { verify } from "jsonwebtoken";
 import { createHandler } from "graphql-http/lib/use/express";
 import { schema } from "./schema";
-import axios from "axios";
+import Axios from "axios";
 
 type Context = { headers: Record<string, string> };
+
+const axios = Axios.create({});
+
+axios.interceptors.response.use((res) => {
+  console.log(`URL: ${res.config?.url}\n${JSON.stringify(res.data)}`);
+  return res;
+});
 
 const UserService = {
   async getAll() {
@@ -43,7 +50,7 @@ const ProductService = {
   async post({ input }, context: Context) {
     const apiKey = context.headers["x-api-key"];
     if (!apiKey || apiKey !== process.env["API_SECRET"])
-      return "Invalid api key";
+      return new Error("Invalid api key");
     return await axios
       .post(`${process.env["PRODUCTS_SERVICE_URL"]}/`, input)
       .then((d) => d.data.result);
