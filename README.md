@@ -65,6 +65,61 @@ input OrderProductInput {
 }
 ```
 
+# Sample queries
+
+```graphql
+query Users {
+  users {
+    _id
+    username
+  }
+}
+
+query Products {
+  products {
+    _id
+    name
+    price
+    quantity
+  }
+}
+
+mutation RegisterUser {
+  registerUser(input: { username: "arth", password: "password" }) {
+    access_token
+  }
+}
+
+# requires x-api-token (check API_SECRET env var)
+mutation CreateProduct {
+  createProduct(input: { name: "chocolate", price: 20, quantity: 10 }) {
+    _id
+    name
+    price
+    quantity
+  }
+}
+
+# protected router, requires Bearer token auth, access_token is received from registerUser mutation
+mutation PlaceOrder {
+  placeOrder(
+    products: [
+      {
+        _id: "Add a valid id received from createProduct or products query"
+        quantity: 10
+      }
+    ]
+  ) {
+    _id
+    products {
+      _id
+      quantity
+    }
+    userId
+  }
+}
+```
+
 # Overview
 
 This project implements a robust, scalable e-commerce system using a microservices architecture.
