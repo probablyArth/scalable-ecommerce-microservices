@@ -1,6 +1,8 @@
+
 # Scalable e-commerce system
 
 ![image](https://github.com/user-attachments/assets/62d2a316-2175-43b7-aa9d-6fe530ba4121)
+<div> <a href="https://www.loom.com/share/2037e233ea8f49e38508d4be303754b1"> <p>Scalable ecommerce app - Watch Video</p> </a> <a href="https://www.loom.com/share/2037e233ea8f49e38508d4be303754b1"> <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/2037e233ea8f49e38508d4be303754b1-c6c670f2772876c5-full-play.gif"> </a> </div>
 
 # Api Spec
 
