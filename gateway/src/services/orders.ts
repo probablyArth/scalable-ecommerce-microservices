@@ -19,7 +19,7 @@ const OrderService = {
     const authorization = context.headers["authorization"];
     let userId = "";
     try {
-      const token = authorization.split(" ")[1];
+      const token = authorization.split("Bearer ")[1];
       if (!token) throw Error();
       const payload = verify(token, process.env["API_SECRET"]) as {
         userId: string;
