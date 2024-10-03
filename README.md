@@ -122,7 +122,7 @@ mutation PlaceOrder {
 
 # Overview
 
-This project implements a robust, scalable e-commerce system using a microservices architecture.
+A robust, scalable e-commerce system using microservices architecture.
 
 # Architecture
 
