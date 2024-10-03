@@ -2,9 +2,72 @@
 
 ![image](https://github.com/user-attachments/assets/62d2a316-2175-43b7-aa9d-6fe530ba4121)
 
+# Api Spec
+
+```graphql
+type Query {
+  users: [User]
+  user(id: ID!): User
+  products: [Product]
+  product(id: ID!): Product
+  orders: [Order]
+  order(id: ID!): Order
+}
+
+type Mutation {
+  registerUser(input: RegisterUserInput): RegisterUserResult
+  createProduct(input: CreateProductInput): Product # admin route, x-api-key required in headers, should match API_SECRET in .env
+  placeOrder(products: [OrderProductInput]): Order # protected route, should have a Bearer token in Authorization header which is signed using API_SECRET in .env and contains {userId: <your_user_id>} - received as access_token from registerUser mutation
+}
+
+type User {
+  _id: ID!
+  username: String!
+}
+
+type Product {
+  _id: ID!
+  name: String!
+  price: Int!
+  quantity: Int!
+}
+
+type OrderProduct {
+  _id: ID!
+  quantity: Int!
+}
+
+type Order {
+  _id: ID!
+  userId: ID!
+  products: [OrderProduct]
+}
+
+input RegisterUserInput {
+  username: String!
+  password: String!
+}
+
+type RegisterUserResult {
+  access_token: String!
+  user: User!
+}
+
+input CreateProductInput {
+  name: String!
+  price: Int!
+  quantity: Int!
+}
+
+input OrderProductInput {
+  _id: String!
+  quantity: Int!
+}
+```
+
 # Overview
 
-This project implements a robust, scalable e-commerce system using a microservices architecture. It leverages modern technologies and design patterns to create a flexible and maintainable platform for online retail operations.
+This project implements a robust, scalable e-commerce system using a microservices architecture.
 
 # Architecture
 
