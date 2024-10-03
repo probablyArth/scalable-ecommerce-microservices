@@ -16,6 +16,7 @@ The system is composed of the following key components:
 - Order Service: Processes and manages customer orders.
 - Apache Kafka: Facilitates event-driven communication between microservices.
 - MongoDB: Provides persistent storage for each microservice.
+- Redis: For Caching frequently accessed data (ex: getting a list of products).
 
 # Features
 
@@ -45,6 +46,10 @@ Improved system resilience and scalability
 - Flexible and efficient data querying
 - Consolidated API for client applications
 
+### Response Caching
+
+- Frequently accessed resource such as list of products is cached in redis and invalidated when inventory is updated.
+
 ### Containerization
 
 Docker-based deployment for easy scaling and management
@@ -57,6 +62,7 @@ Docker-based deployment for easy scaling and management
 - Message Broker: Apache Kafka
 - Authentication: JSON Web Tokens (JWT)
 - Containerization: Docker and Docker Compose
+- Caching: Redis (K/V)
 
 # Implementation Highlights
 
